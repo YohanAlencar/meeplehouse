@@ -3,119 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MeepleHouse - Inventário de Board Games</title>
-    <!-- Bootstrap 5 CSS -->
+    <title>MeepleHouse - A Taberna dos Jogos de Tabuleiro</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <style>
-        body { 
-            background-color: #f4f1ea; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        :root {
+            --bg-body: #f4eee1;          /* Fundo estilo pergaminho claro e acolhedor */
+            --bg-card: #ffffff;          /* Cartões totalmente brancos e limpos */
+            --bg-input: #fdfbf7;         /* Inputs com fundo suave */
+            --border-wood: #d3c2a8;      /* Bordas discretas em tom madeira clara */
+            --gold-primary: #8c6239;     /* Tom de madeira nobre / castanho dourado elegante */
+            --text-main: #2c241d;        /* Texto escuro de altíssima legibilidade */
+            --text-muted: #6b5c4d;       /* Texto secundário equilibrado */
         }
-        /* Banner Temático de Taberna */
-        .tavern-banner {
-            background: linear-gradient(135deg, #2b1810 0%, #3e2217 100%);
-            border-bottom: 4px solid #d4af37;
-            border-radius: 12px;
-            color: #f4f1ea;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Lora', serif;
+            min-height: 100vh;
         }
-        .tavern-title {
-            color: #f3e5ab;
-            font-weight: 700;
+
+        h1, h2, h3, .navbar-brand, .card-header, th {
+            font-family: 'Cinzel', serif;
+        }
+
+        .tavern-header {
+            background: linear-gradient(135deg, #3d3127 0%, #201a14 100%);
+            color: #f4eee1;
+            border-bottom: 4px solid #b38b59;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .tavern-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-wood);
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+        }
+
+        .card-header-tavern {
+            background-color: #faf5ed !important;
+            border-bottom: 2px solid var(--border-wood) !important;
+            color: #3d3127 !important;
+        }
+
+        .form-control, .form-select {
+            background-color: var(--bg-input);
+            border: 1px solid var(--border-wood);
+            color: var(--text-main);
+            border-radius: 6px;
+            padding: 0.65rem 1rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background-color: #ffffff;
+            border-color: var(--gold-primary);
+            color: var(--text-main);
+            box-shadow: 0 0 0 0.25rem rgba(140, 98, 57, 0.15);
+        }
+
+        .form-label {
+            color: var(--gold-primary);
+            font-size: 0.85rem;
             letter-spacing: 0.5px;
+            font-weight: 700;
         }
-        .card { 
-            border-radius: 12px; 
-            border: none; 
+
+        .btn-tavern {
+            background: linear-gradient(135deg, #8c6239 0%, #634323 100%);
+            border: 1px solid #52351b;
+            color: #ffffff;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            padding: 0.6rem 1.5rem;
+            border-radius: 6px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+            transition: all 0.2s ease-in-out;
         }
-        .card-header.bg-primary {
-            background-color: #4a2e1b !important;
+
+        .btn-tavern:hover {
+            background: linear-gradient(135deg, #a37344, #734f2a);
+            color: #ffffff;
+            transform: translateY(-1px);
         }
-        .card-header.bg-secondary {
-            background-color: #2b1810 !important;
+
+        .table-tavern {
+            color: var(--text-main);
+            background-color: transparent;
+            margin-bottom: 0;
         }
-        .badge-estado-Novo { background-color: #198754; }
-        .badge-estado-Excelente { background-color: #0d6efd; }
-        .badge-estado-Bom { background-color: #0dcaf0; color: #000; }
-        .badge-estado-Desgastado { background-color: #ffc107; color: #000; }
-        .btn-success {
-            background-color: #5c3a21;
-            border-color: #4a2e1b;
+
+        .table-tavern th {
+            background-color: #3d3127;
+            color: #f4eee1;
+            border-color: var(--border-wood);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            padding: 1rem;
         }
-        .btn-success:hover {
-            background-color: #4a2e1b;
-            border-color: #3e2217;
+
+        .table-tavern td {
+            border-color: #eae1d2;
+            vertical-align: middle;
+            padding: 1rem;
+        }
+
+        .table-tavern tbody tr:hover {
+            background-color: rgba(140, 98, 57, 0.04);
+        }
+
+        .badge-tavern {
+            background-color: #3d3127;
+            color: #f4eee1;
+            font-family: 'Cinzel', serif;
+            font-weight: 700;
+            border: 1px solid #b38b59;
+            padding: 0.5rem 1rem;
+        }
+
+        .badge-estado {
+            background-color: #f0eae1;
+            color: #52351b;
+            border: 1px solid var(--border-wood);
+            font-family: 'Cinzel', serif;
+            font-size: 0.85rem;
         }
     </style>
 </head>
 <body>
 
-    <div class="container py-4">
-        <!-- Banner Estilo Taberna -->
-        <div class="tavern-banner p-4 mb-4 d-flex flex-column flex-md-row justify-content-between align-items-center">
-            <div class="mb-3 mb-md-0 text-center text-md-start">
-                <h1 class="tavern-title h3 mb-1"><i class="fa-solid fa-chess-rook me-2"></i>MeepleHouse</h1>
-                <p class="mb-0 text-light opacity-75 small">O refúgio oficial da tua coleção de jogos de tabuleiro</p>
+    <header class="tavern-header py-4 mb-4">
+        <div class="container d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 mb-1 fw-bold">🏰 MeepleHouse</h1>
+                <p class="mb-0 small fst-italic text-light opacity-75">O refúgio oficial da tua coleção de jogos de tabuleiro</p>
             </div>
-            <div class="bg-dark bg-opacity-50 px-4 py-2 rounded-pill border border-warning border-opacity-50 text-center">
-                <span class="text-warning small text-uppercase fw-bold d-block">Jogos na Taberna</span>
-                <h3 class="mb-0 text-white fw-bold" id="total-jogos">0</h3>
+            <div class="text-end">
+                <span class="badge badge-tavern fs-6 rounded-pill shadow-sm">
+                    🛡️ JOGOS NA TABERNA: <span id="contador-jogos">0</span>
+                </span>
             </div>
         </div>
+    </header>
 
-        <!-- Painel de Cadastro e Edição -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-primary text-white py-3 fw-bold" id="form-title">
-                <i class="fa-solid fa-circle-plus me-2"></i>Adicionar Novo Jogo
+    <main class="container mb-5">
+        
+        <div class="card tavern-card mb-4">
+            <div class="card-header card-header-tavern py-3 px-4">
+                <h5 class="mb-0 fw-bold" id="form-titulo">✨ Registar Novo Jogo</h5>
             </div>
             <div class="card-body p-4">
-                <form id="jogo-form">
+                <form id="form-jogo">
                     <input type="hidden" id="jogo-id">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label for="titulo" class="form-label text-secondary fw-semibold">Título</label>
-                            <input type="text" class="form-control" id="titulo" required placeholder="Ex: Catan, Carcassonne...">
+                            <label for="titulo" class="form-label">📜 TÍTULO DO JOGO</label>
+                            <input type="text" class="form-control" id="titulo" required placeholder="Ex: Catan">
                         </div>
                         <div class="col-md-6">
-                            <label for="editora" class="form-label text-secondary fw-semibold">Editora</label>
-                            <input type="text" class="form-control" id="editora" required placeholder="Ex: Devir, Galápagos...">
+                            <label for="editora" class="form-label">🏛️ EDITORA</label>
+                            <input type="text" class="form-control" id="editora" required placeholder="Ex: Devir">
                         </div>
                         <div class="col-md-4">
-                            <label for="tempo" class="form-label text-secondary fw-semibold">Tempo de Partida (min)</label>
-                            <input type="number" class="form-control" id="tempo" required placeholder="Ex: 60">
+                            <label for="tempo" class="form-label">⏳ TEMPO DE PARTIDA (MIN)</label>
+                            <input type="number" class="form-control" id="tempo" required min="1" placeholder="Ex: 60">
                         </div>
                         <div class="col-md-4">
-                            <label for="jogadores" class="form-label text-secondary fw-semibold">Nº de Jogadores</label>
+                            <label for="jogadores" class="form-label">👥 Nº DE JOGADORES</label>
                             <input type="text" class="form-control" id="jogadores" required placeholder="Ex: 2-4">
                         </div>
                         <div class="col-md-4">
-                            <label for="estado" class="form-label text-secondary fw-semibold">Estado de Conservação</label>
+                            <label for="estado" class="form-label">💎 ESTADO DE CONSERVAÇÃO</label>
                             <select class="form-select" id="estado" required>
+                                <option value="" disabled selected>Selecionar estado...</option>
                                 <option value="Novo">Novo</option>
                                 <option value="Excelente">Excelente</option>
                                 <option value="Bom">Bom</option>
                                 <option value="Desgastado">Desgastado</option>
                             </select>
                         </div>
-                        <div class="col-12 text-end pt-3">
-                            <button type="button" id="btn-cancelar" class="btn btn-secondary me-2 d-none" onclick="cancelarEdicao()">Cancelar</button>
-                            <button type="submit" class="btn btn-success px-4" id="btn-salvar"><i class="fa-solid fa-check me-2"></i>Salvar Jogo</button>
+                        <div class="col-12 text-end mt-4">
+                            <button type="button" id="btn-cancelar" class="btn btn-outline-secondary me-2 d-none">Cancelar</button>
+                            <button type="submit" class="btn btn-tavern px-4 py-2">💾 Guardar Jogo</button>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- Tabela de Jogos -->
-        <div class="card shadow-sm">
-            <div class="card-header bg-secondary text-white py-3 fw-bold">
-                <i class="fa-solid fa-scroll me-2"></i>Acervo de Jogos
+        <div class="card tavern-card">
+            <div class="card-header card-header-tavern py-3 px-4">
+                <h5 class="mb-0 fw-bold">🗺️ Acervo Registado na Taberna</h5>
             </div>
             <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light text-secondary">
+                    <table class="table table-tavern table-hover align-middle">
+                        <thead>
                             <tr>
                                 <th class="ps-4">Título</th>
                                 <th>Editora</th>
@@ -126,13 +210,12 @@
                             </tr>
                         </thead>
                         <tbody id="tabela-jogos">
-                            <!-- Preenchido via JS -->
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <script>
         const API_URL = "http://localhost:8000";
@@ -142,30 +225,27 @@
                 const response = await fetch(`${API_URL}/jogos`);
                 const jogos = await response.json();
                 const tbody = document.getElementById("tabela-jogos");
-                document.getElementById("total-jogos").innerText = jogos.length || 0;
+                const contador = document.getElementById("contador-jogos");
+                
                 tbody.innerHTML = "";
+                contador.textContent = jogos.length;
 
-                if (!Array.isArray(jogos) || jogos.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">A taberna está vazia. Nenhum jogo cadastrado.</td></tr>`;
+                if (jogos.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted fst-italic">A taberna está vazia. Nenhum jogo cadastrado.</td></tr>`;
                     return;
                 }
 
                 jogos.forEach(jogo => {
-                    const badgeClass = `badge-estado-${jogo.estado}` || 'bg-secondary';
                     tbody.innerHTML += `
                         <tr>
-                            <td class="ps-4"><strong>${jogo.titulo}</strong></td>
+                            <td class="ps-4 fw-bold text-dark">${jogo.titulo}</td>
                             <td>${jogo.editora}</td>
-                            <td><i class="fa-regular fa-clock me-1 text-muted"></i>${jogo.tempo} min</td>
-                            <td><i class="fa-solid fa-users me-1 text-muted"></i>${jogo.jogadores}</td>
-                            <td><span class="badge ${badgeClass} p-2">${jogo.estado}</span></td>
+                            <td>${jogo.tempo} min</td>
+                            <td>${jogo.jogadores}</td>
+                            <td><span class="badge badge-estado px-3 py-2">${jogo.estado}</span></td>
                             <td class="text-end pe-4">
-                                <button class="btn btn-sm btn-outline-primary me-1" onclick='prepararEdicao(${JSON.stringify(jogo)})'>
-                                    <i class="fa-solid fa-pen me-1"></i>Editar
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="excluirJogo(${jogo.id})">
-                                    <i class="fa-solid fa-trash me-1"></i>Excluir
-                                </button>
+                                <button class="btn btn-sm btn-outline-dark me-1 px-3" onclick='prepararEdicao(${JSON.stringify(jogo)})'>Editar</button>
+                                <button class="btn btn-sm btn-outline-danger px-3" onclick='excluirJogo(${jogo.id})'>Excluir</button>
                             </td>
                         </tr>
                     `;
@@ -175,10 +255,10 @@
             }
         }
 
-        document.getElementById("jogo-form").addEventListener("submit", async function(e) {
+        document.getElementById("form-jogo").addEventListener("submit", async function(e) {
             e.preventDefault();
             const id = document.getElementById("jogo-id").value;
-            const jogoData = {
+            const dados = {
                 titulo: document.getElementById("titulo").value,
                 editora: document.getElementById("editora").value,
                 tempo: parseInt(document.getElementById("tempo").value),
@@ -186,24 +266,31 @@
                 estado: document.getElementById("estado").value
             };
 
-            const url = id ? `${API_URL}/jogos/${id}` : `${API_URL}/jogos`;
-            const method = id ? "PUT" : "POST";
-
             try {
-                const response = await fetch(url, {
-                    method: method,
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(jogoData)
-                });
+                let response;
+                if (id) {
+                    response = await fetch(`${API_URL}/jogos/${id}`, {
+                        method: "PUT",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(dados)
+                    });
+                } else {
+                    response = await fetch(`${API_URL}/jogos`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(dados)
+                    });
+                }
 
                 if (response.ok) {
-                    cancelarEdicao();
+                    limparFormulario();
                     carregarJogos();
                 } else {
                     alert("Erro ao salvar o jogo.");
                 }
             } catch (error) {
                 console.error("Erro:", error);
+                alert("Erro de conexão com a API.");
             }
         });
 
@@ -214,28 +301,26 @@
             document.getElementById("tempo").value = jogo.tempo;
             document.getElementById("jogadores").value = jogo.jogadores;
             document.getElementById("estado").value = jogo.estado;
-
-            document.getElementById("form-title").innerHTML = `<i class="fa-solid fa-pen-to-square me-2"></i>Editar Jogo (ID: ${jogo.id})`;
-            document.getElementById("btn-salvar").innerHTML = `<i class="fa-solid fa-check me-2"></i>Atualizar Jogo`;
+            
+            document.getElementById("form-titulo").textContent = "🛠️ Editar Jogo";
             document.getElementById("btn-cancelar").classList.remove("d-none");
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function cancelarEdicao() {
-            document.getElementById("jogo-form").reset();
+        document.getElementById("btn-cancelar").addEventListener("click", limparFormulario);
+
+        function limparFormulario() {
+            document.getElementById("form-jogo").reset();
             document.getElementById("jogo-id").value = "";
-            document.getElementById("form-title").innerHTML = `<i class="fa-solid fa-circle-plus me-2"></i>Adicionar Novo Jogo`;
-            document.getElementById("btn-salvar").innerHTML = `<i class="fa-solid fa-check me-2"></i>Salvar Jogo`;
+            document.getElementById("form-titulo").textContent = "✨ Registar Novo Jogo";
             document.getElementById("btn-cancelar").classList.add("d-none");
         }
 
         async function excluirJogo(id) {
-            if (confirm("Tens a certeza que pretendes excluir este jogo?")) {
+            if (confirm("Tens a certeza que queres remover este jogo?")) {
                 try {
-                    const response = __await_fetch_delete__(`${API_URL}/jogos/${id}`, { method: "DELETE" });
-                    // code normal abaixo:
-                    const resDel = await fetch(`${API_URL}/jogos/${id}`, { method: "DELETE" });
-                    if (resDel.ok) {
+                    const response = await fetch(`${API_URL}/jogos/${id}`, { method: "DELETE" });
+                    if (response.ok) {
                         carregarJogos();
                     } else {
                         alert("Erro ao excluir o jogo.");
