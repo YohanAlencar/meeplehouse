@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MeepleHouse - Inventário de Jogos</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .card {
+            border: none;
+            border-radius: 12px;
+        }
+        .table-hover tbody tr:hover {
+            background-color: rgba(13, 110, 253, 0.04);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar Superior -->
+    <nav class="navbar navbar-dark bg-dark shadow-sm mb-4">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1">
+                <i class="bi bi-dice-5-fill text-warning me-2"></i> MeepleHouse
+            </span>
+            <span class="text-muted small">Gestão de Acervo de Board Games</span>
+        </div>
+    </nav>
+
+    <div class="container pb-5">
+        
+        <!-- Estatísticas / Contador -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card bg-white shadow-sm p-3 d-flex flex-row align-items-center justify-content-between">
+                    <div>
+                        <h6 class="text-muted mb-1">Total de Jogos no Acervo</h6>
+                        <h3 id="contadorJogos" class="fw-bold text-primary mb-0">0</h3>
+                    </div>
+                    <div class="fs-1 text-primary opacity-25">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulário de Cadastro -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white py-3 rounded-top-4">
+                <h5 class="mb-0"><i class="bi bi-plus-circle me-2"></i> Adicionar Novo Jogo</h5>
+            </div>
+            <div class="card-body p-4">
+                <form id="formJogo">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="titulo" class="form-label fw-semibold">Título</label>
+                            <input type="text" class="form-control" id="titulo" placeholder="Ex: Catan, Carcassonne..." required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="editora" class="form-label fw-semibold">Editora</label>
+                            <input type="text" class="form-control" id="editora" placeholder="Ex: Devir, Galápagos..." required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="tempo_partida" class="form-label fw-semibold">Tempo de Partida (min)</label>
+                            <input type="number" class="form-control" id="tempo_partida" placeholder="Ex: 60" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="numero_jogadores" class="form-label fw-semibold">Nº de Jogadores</label>
+                            <input type="text" class="form-control" id="numero_jogadores" placeholder="Ex: 2-4" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="estado_conservacao" class="form-label fw-semibold">Estado de Conservação</label>
+                            <select class="form-select" id="estado_conservacao" required>
+                                <option value="Novo">Novo</option>
+                                <option value="Excelente">Excelente</option>
+                                <option value="Bom">Bom</option>
+                                <option value="Desgastado">Desgastado</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-end">
+                        <button type="submit" class="btn btn-success px-4 fw-semibold">
+                            <i class="bi bi-check-lg me-1"></i> Salvar Jogo
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tabela de Acervo -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-secondary text-white py-3 rounded-top-4 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-collection me-2"></i> Lista de Jogos</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Título</th>
+                                <th>Editora</th>
+                                <th>Tempo</th>
+                                <th>Jogadores</th>
+                                <th>Estado</th>
+                                <th class="text-end pe-4">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaJogos">
+                            <!-- Injetado via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script JS -->
+    <script>
+        const API_URL = 'http://localhost:8000/jogos';
+
+        function obterBadgeEstado(estado) {
+            switch(estado) {
+                case 'Novo': return 'bg-success';
+                case 'Excelente': return 'bg-primary';
+                case 'Bom': return 'bg-info text-dark';
+                case 'Desgastado': return 'bg-warning text-dark';
+                default: return 'bg-secondary';
+            }
+        }
+
+        async function carregarJogos() {
+            try {
+                const response = await fetch(API_URL);
+                const jogos = await response.json();
+                const tbody = document.getElementById('tabelaJogos');
+                const contador = document.getElementById('contadorJogos');
+                
+                contador.textContent = jogos.length;
+                tbody.innerHTML = '';
+
+                if (jogos.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">Nenhum jogo registado no acervo ainda.</td></tr>`;
+                    return;
+                }
+
+                jogos.forEach(jogo => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="ps-4 fw-semibold text-dark">${jogo.titulo}</td>
+                        <td class="text-muted">${jogo.editora}</td>
+                        <td><i class="bi bi-clock me-1 text-muted"></i>${jogo.tempo_partida} min</td>
+                        <td><i class="bi bi-people me-1 text-muted"></i>${jogo.numero_jogadores}</td>
+                        <td><span class="badge ${obterBadgeEstado(jogo.estado_conservacao)}">${jogo.estado_conservacao}</span></td>
+                        <td class="text-end pe-4">
+                            <button class="btn btn-outline-danger btn-sm" onclick="deletarJogo('${jogo.id}')">
+                                <i class="bi bi-trash"></i> Excluir
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar jogos:', error);
+            }
+        }
+
+        document.getElementById('formJogo').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const novoJogo = {
+                titulo: document.getElementById('titulo').value,
+                editora: document.getElementById('editora').value,
+                tempo_partida: parseInt(document.getElementById('tempo_partida').value),
+                numero_jogadores: document.getElementById('numero_jogadores').value,
+                estado_conservacao: document.getElementById('estado_conservacao').value,
+                status: "Na prateleira"
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(novoJogo)
+                });
+
+                if (response.ok) {
+                    document.getElementById('formJogo').reset();
+                    carregarJogos();
+                } else {
+                    alert('Erro ao salvar o jogo.');
+                }
+            } catch (error) {
+                console.error('Erro ao enviar dados:', error);
+            }
+        });
+
+        async function deletarJogo(id) {
+            if (confirm('Tens a certeza que pretendes excluir este jogo?')) {
+                try {
+                    const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                    if (response.ok) {
+                        carregarJogos();
+                    } else {
+                        alert('Erro ao excluir o jogo.');
+                    }
+                } catch (error) {
+                    console.error('Erro ao excluir:', error);
+                }
+            }
+        }
+
+        carregarJogos();
+    </script>
+</body>
+</html>
