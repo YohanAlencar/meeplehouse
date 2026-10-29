@@ -1,13 +1,12 @@
-import json
-import os
-import uuid
-from typing import List, Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import json
+import os
 
-app = FastAPI(title="MeepleHouse API")
+app = FastAPI(title="MeepleHouse API", version="1.0.0")
 
+# Permitir requisições do frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -16,51 +15,56 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-DB_FILE = "jogos.json"
+ARQUIVO_DADOS = "jogos.json"
 
-def ler_dados():
-    if not os.path.exists(DB_FILE):
-        return []
-    try:
-        with open(DB_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception:
-        return []
-
-def escrever_dados(dados):
-    with open(DB_FILE, "w", encoding="utf-8") as f:
-        json.dump(dados, f, ensure_ascii=False, indent=4)
-
-class JogoSchema(BaseModel):
-    id: Optional[str] = None
+class Jogo(BaseModel):
     titulo: str
     editora: str
-    tempo_partida: int
-    numero_jogadores: str
-    estado_conservacao: str
-    status: Optional[str] = "Na prateleira"
+    tempo: int
+    jogadores: str
+    estado: str
 
-@app.get("/jogos", response_model=List[JogoSchema])
+def ler_dados():
+    if not os.path.exists(ARQUIVO_DADOS):
+        return []
+    with open(ARQUIVO_DADOS, "r", encoding="utf-8") as f:
+        try:
+            return json.load(f)
+        except json.JSONDecodeError:
+            return []
+
+def salvar_dados(dados):
+    with open(ARQUIVO_DADOS, "w", encoding="utf-8") as f:
+        json.dump(dados, f, ensure_ascii=False, indent=4)
+
+@app.get("/jogos")
 def listar_jogos():
     return ler_dados()
 
-@app.post("/jogos", response_model=JogoSchema)
-def criar_jogo(jogo: JogoSchema):
+@app.post("/jogos")
+def criar_jogo(jogo: Jogo):
     jogos = ler_dados()
-    if not jogo.id:
-        jogo.id = str(uuid.uuid4())
-    
-    jogos.append(jogo.dict())
-    escrever_dados(jogos)
-    return jogo
+    novo_id = max([j.get("id", 0) for j in jogos], default=0) + 1
+    novo_jogo = {"id": novo_id, **jogo.dict()}
+    jogos.append(novo_jogo)
+    salvar_dados(jogos)
+    return {"mensagem": "Jogo cadastrado com sucesso!", "jogo": novo_jogo}
+
+@app.put("/jogos/{jogo_id}")
+def atualizar_jogo(jogo_id: int, jogo: Jogo):
+    jogos = ler_dados()
+    for index, j in enumerate(jogos):
+        if j.get("id") == jogo_id:
+            jogos[index] = {"id": jogo_id, **jogo.dict()}
+            salvar_dados(jogos)
+            return {"mensagem": "Jogo atualizado com sucesso!", "jogo": jogos[index]}
+    raise HTTPException(status_code=404, detail="Jogo não encontrado.")
 
 @app.delete("/jogos/{jogo_id}")
-def deletar_jogo(jogo_id: str):
+def excluir_jogo(jogo_id: int):
     jogos = ler_dados()
     novos_jogos = [j for j in jogos if j.get("id") != jogo_id]
-    
     if len(novos_jogos) == len(jogos):
-        raise HTTPException(status_code=404, detail="Jogo não encontrado")
-    
-    escrever_dados(novos_jogos)
-    return {"message": "Jogo removido com sucesso"}
+        raise HTTPException(status_code=404, detail="Jogo não encontrado.")
+    salvar_dados(novos_jogos)
+    return {"mensagem": "Jogo excluído com sucesso!"}
